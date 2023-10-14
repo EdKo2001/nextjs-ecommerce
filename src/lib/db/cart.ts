@@ -4,16 +4,20 @@ import CryptoJS from "crypto-js";
 
 import { Prisma } from "@prisma/client";
 import { prisma } from "./prisma";
+import { env } from "../env";
 
 export type CartWithProducts = Prisma.CartGetPayload<{
   include: { items: { include: { product: true } } };
+}>;
+
+export type CartItemWithProduct = Prisma.CartItemGetPayload<{
+  include: { product: true };
 }>;
 
 export type ShoppingCart = CartWithProducts & {
   size: number;
   subtotal: number;
 };
-
 export async function getCart(): Promise<ShoppingCart | null> {
   const localCartId = cookies().get("localCartId")?.value || "";
   const decryptedLocalCartId = decryptData(localCartId);
@@ -60,18 +64,12 @@ export async function createCart(): Promise<ShoppingCart> {
 }
 
 export function encryptData(data: string): string {
-  const encryptedData = CryptoJS.AES.encrypt(
-    data,
-    process.env.SECRET_KEY || "",
-  ).toString();
+  const encryptedData = CryptoJS.AES.encrypt(data, env.SECRET_KEY).toString();
   return encryptedData;
 }
 
 export function decryptData(encryptedData: string): string {
-  const decryptedBytes = CryptoJS.AES.decrypt(
-    encryptedData,
-    process.env.SECRET_KEY || "",
-  );
+  const decryptedBytes = CryptoJS.AES.decrypt(encryptedData, env.SECRET_KEY);
   const decryptedData = decryptedBytes.toString(CryptoJS.enc.Utf8);
   return decryptedData;
 }
