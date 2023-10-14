@@ -1,10 +1,13 @@
-import { cache } from "react";
 import { Metadata } from "next";
-import { notFound } from "next/navigation";
 import Image from "next/image";
+import { notFound } from "next/navigation";
+import { cache } from "react";
 
-import { prisma } from "@/lib/db/prisma";
+import AddToCartButton from "./AddToCartButton";
 import PriceTag from "@/components/PriceTag";
+
+import { incrementProductQuantity } from "./actions";
+import { prisma } from "@/lib/db/prisma";
 
 interface ProductPageProps {
   params: {
@@ -25,7 +28,7 @@ export async function generateMetadata({
 
   return {
     title: product.name + " - Flowmazon",
-    description: product.description + " - Flowmazon",
+    description: product.description,
     openGraph: {
       images: [{ url: product.imageUrl }],
     },
@@ -47,10 +50,15 @@ export default async function ProductPage({
         className="rounded-lg"
         priority
       />
+
       <div>
         <h1 className="text-5xl font-bold">{product.name}</h1>
         <PriceTag price={product.price} className="mt-4" />
         <p className="py-6">{product.description}</p>
+        <AddToCartButton
+          productId={product.id}
+          incrementProductQuantity={incrementProductQuantity}
+        />
       </div>
     </div>
   );

@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 
-import { prisma } from "@/lib/db/prisma";
-
 import FormSubmitButton from "@/components/FormSubmitButton";
+
+import { prisma } from "@/lib/db/prisma";
 
 export const metadata = {
   title: "Add Product - Flowmazon",
