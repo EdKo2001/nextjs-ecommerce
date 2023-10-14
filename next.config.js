@@ -2,7 +2,7 @@
 const nextConfig = {
     images: {
         remotePatterns: [
-            { hostname: 'hips.hearstapps.com' }, { hostname: 'static.pcbuilder.net' }
+            { hostname: 'hips.hearstapps.com' }, { hostname: 'static.pcbuilder.net' }, { hostname: 'lh3.googleusercontent.com' }
         ]
     },
     experimental: {
