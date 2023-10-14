@@ -1,11 +1,32 @@
-import ProductCard from "@/components/reusables/ProductCard";
-import { prisma } from "@/lib/db/prisma";
 import Image from "next/image";
 import Link from "next/link";
 
-export default async function Home() {
+import PaginationBar from "@/components/reusables/PaginationBar";
+import ProductCard from "@/components/reusables/ProductCard";
+
+import { prisma } from "@/lib/db/prisma";
+
+interface HomeProps {
+  searchParams: { page: string };
+}
+
+export default async function Home({
+  searchParams: { page = "1" },
+}: HomeProps) {
+  const currentPage = parseInt(page);
+
+  const pageSize = 6;
+  const heroItemCount = 1;
+
+  const totalItemCount = await prisma.product.count();
+
+  const totalPages = Math.ceil((totalItemCount - heroItemCount) / pageSize);
+
   const products = await prisma.product.findMany({
     orderBy: { id: "desc" },
+    skip:
+      (currentPage - 1) * pageSize + (currentPage === 1 ? 0 : heroItemCount),
+    take: pageSize + (currentPage === 1 ? heroItemCount : 0),
   });
 
   return (
@@ -38,6 +59,10 @@ export default async function Home() {
           <ProductCard product={product} key={product.id} />
         ))}
       </div>
+
+      {totalPages > 1 && (
+        <PaginationBar currentPage={currentPage} totalPages={totalPages} />
+      )}
     </div>
   );
 }
