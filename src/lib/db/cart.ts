@@ -34,7 +34,8 @@ export async function getCart(): Promise<ShoppingCart | null> {
   } else {
     const localCartId = cookies().get("localCartId")?.value;
     const decryptedLocalCartId = decryptData(localCartId || "");
-    cart = localCartId
+
+    cart = decryptedLocalCartId
       ? await prisma.cart.findUnique({
           where: { id: decryptedLocalCartId },
           include: { items: { include: { product: true } } },
@@ -123,12 +124,18 @@ export async function mergeAnonymousCartIntoUserCart(userId: string) {
         where: { cartId: userCart.id },
       });
 
-      await tx.cartItem.createMany({
-        data: mergedCartItems.map((item) => ({
-          cartId: userCart.id,
-          productId: item.productId,
-          quantity: item.quantity,
-        })),
+      await tx.cart.update({
+        where: { id: userCart.id },
+        data: {
+          items: {
+            createMany: {
+              data: mergedCartItems.map((item) => ({
+                productId: item.productId,
+                quantity: item.quantity,
+              })),
+            },
+          },
+        },
       });
     } else {
       await tx.cart.create({
@@ -149,7 +156,7 @@ export async function mergeAnonymousCartIntoUserCart(userId: string) {
     await tx.cart.delete({
       where: { id: localCart.id },
     });
-
+    // throw Error("Transaction failed");
     cookies().set("localCartId", "");
   });
 }
