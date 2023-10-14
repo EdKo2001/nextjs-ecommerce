@@ -1,11 +1,13 @@
 import Link from "next/link";
 
 interface PaginationBarProps {
+  hrefBuilder?: string;
   currentPage: number;
   totalPages: number;
 }
 
 export default function PaginationBar({
+  hrefBuilder,
   currentPage,
   totalPages,
 }: PaginationBarProps) {
@@ -17,7 +19,7 @@ export default function PaginationBar({
   for (let page = minPage; page <= maxPage; page++) {
     numberedPageItems.push(
       <Link
-        href={"?page=" + page}
+        href={"?page=" + page + (hrefBuilder ? hrefBuilder : "")}
         key={page}
         className={`btn join-item ${
           currentPage === page ? "btn-active pointer-events-none" : ""
@@ -32,7 +34,12 @@ export default function PaginationBar({
     <div className="mx-auto my-6 w-fit">
       <div className="join">
         {currentPage > 1 && (
-          <Link href={"?page=" + (currentPage - 1)} className="btn join-item">
+          <Link
+            href={
+              "?page=" + (currentPage - 1) + (hrefBuilder ? hrefBuilder : "")
+            }
+            className="btn join-item"
+          >
             «
           </Link>
         )}
@@ -41,7 +48,12 @@ export default function PaginationBar({
           Page {currentPage}
         </button>
         {currentPage < totalPages && (
-          <Link href={"?page=" + (currentPage + 1)} className="btn join-item">
+          <Link
+            href={
+              "?page=" + (currentPage + 1) + (hrefBuilder ? hrefBuilder : "")
+            }
+            className="btn join-item"
+          >
             »
           </Link>
         )}

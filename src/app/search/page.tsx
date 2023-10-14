@@ -1,11 +1,12 @@
 import { Metadata } from "next";
 
 import ProductCard from "@/components/reusables/ProductCard";
+import PaginationBar from "@/components/reusables/PaginationBar";
 
 import { prisma } from "@/lib/db/prisma";
 
 interface SearchPageProps {
-  searchParams: { query: string };
+  searchParams: { query: string; page: string };
 }
 
 export function generateMetadata({
@@ -17,8 +18,24 @@ export function generateMetadata({
 }
 
 export default async function SearchPage({
-  searchParams: { query },
+  searchParams: { query, page = "1" },
 }: SearchPageProps) {
+  const currentPage = parseInt(page);
+
+  const pageSize = 6;
+  const heroItemCount = 1;
+
+  const totalItemCount = await prisma.product.count({
+    where: {
+      OR: [
+        { name: { contains: query, mode: "insensitive" } },
+        { description: { contains: query, mode: "insensitive" } },
+      ],
+    },
+  });
+
+  const totalPages = Math.ceil((totalItemCount - heroItemCount) / pageSize);
+
   const products = await prisma.product.findMany({
     where: {
       OR: [
@@ -27,6 +44,9 @@ export default async function SearchPage({
       ],
     },
     orderBy: { id: "desc" },
+    skip:
+      (currentPage - 1) * pageSize + (currentPage === 1 ? 0 : heroItemCount),
+    take: pageSize + (currentPage === 1 ? heroItemCount : 0),
   });
 
   if (products.length === 0) {
@@ -41,6 +61,13 @@ export default async function SearchPage({
           <ProductCard product={product} key={product.id} />
         ))}
       </div>
+      {totalPages > 1 && (
+        <PaginationBar
+          hrefBuilder={`&query=${query}`}
+          currentPage={currentPage}
+          totalPages={totalPages}
+        />
+      )}
     </div>
   );
 }
