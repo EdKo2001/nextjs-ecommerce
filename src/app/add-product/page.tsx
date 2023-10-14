@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import FormSubmitButton from "@/components/FormSubmitButton";
+import FormSubmitButton from "@/components/reusables/FormSubmitButton";
 
 import { prisma } from "@/lib/db/prisma";
 

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 
 import AddToCartButton from "./AddToCartButton";
-import PriceTag from "@/components/PriceTag";
+import PriceTag from "@/components/reusables/PriceTag";
 
 import { incrementProductQuantity } from "./actions";
 import { prisma } from "@/lib/db/prisma";
